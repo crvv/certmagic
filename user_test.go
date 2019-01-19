@@ -209,3 +209,26 @@ func TestGetEmail(t *testing.T) {
 		t.Errorf("Did not get correct email from storage; expected '%s' but got '%s'", "test4-3@foo.com", actual)
 	}
 }
+
+func TestGetEmailNotOverrideUser(t *testing.T) {
+	agreementTestURL = "(none - testing)"
+	testConfig.Email = ""
+	user0, err := testConfig.getUser("")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = testConfig.saveUser(user0)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = testConfig.getEmail(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user1, err := testConfig.getUser("")
+	if !privateKeysSame(user0.key, user1.key) {
+		t.Fatal("override user")
+	}
+}
